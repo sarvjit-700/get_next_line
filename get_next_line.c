@@ -24,12 +24,12 @@ int		ft_find_newline(const char *str)
 	{
 		if (str[i] == '\n')
 		{
-			printf("newline found \n");  //print
-			return (1);
+//			printf("newline found at i =%d \n", i);  //print
+			return (i);
 		}
 		i++;
 	}
-	return (0);
+	return (-1);
 }
 
 
@@ -77,17 +77,14 @@ char	*ft_read(int fd, char *txt)
 {
 	char	*buff;
 	int		num_chars;
-	int		i;
 
-	i = 1;
 	buff = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (buff == NULL)
 		return (NULL);
 	num_chars = 1;
-	while (num_chars != 0 && (!ft_find_newline(txt)))
+	while ((num_chars = read(fd, buff, BUFFER_SIZE)) >0)
 	{
-		printf("In while loop\n");  // print
-		num_chars = read(fd, buff, BUFFER_SIZE);
+//		printf("In while loop\n");  // print
 		if (num_chars == -1)
 		{
 			free(buff);
@@ -95,66 +92,96 @@ char	*ft_read(int fd, char *txt)
 			return (NULL);
 		}
 		buff[num_chars] = '\0';
-		i++;
 		txt = ft_append(txt, buff);
-		printf("so far num_chars = %d, buff = %s\n", num_chars, buff); //print
+		if (txt == NULL || ft_find_newline(txt) >= 0)
+			break;
 	}
 	return (txt);
 }
 
-
-
-char	*ft_keep(char *txt, int flag)
+char	*ft_keep(char *str)
 {
-	int	i;
+	int	x,i;
 	char	*keep;
 
 	i = 0;
-	if (txt == NULL)
-		return (0);
-	while (txt[i] != '\0')
+	x = ft_find_newline(str);
+//	printf("HERE x= %d\n", x);
+	if (x == -1)
 	{
-		if (txt[i] == '\n' && flag == 0)
-		{
-			printf("newline found - returning 1 \n");  //print
-			return (1);
-		}
-		if (txt[i] == '\n' && flag == 1)
-		{
-			keep = malloc(i * sizeof(char));
-			if (keep == NULL)
-				return NULL;
-			keep[i] = '\0' // replacing \n with '\0'
-			i--;  //to go back from \n which is now '\0'
-			while (i > 0)
-			{	
-				keep[i] = txt[i]
-				i--;
-			}
-			return (keep));
-		}
+		x = ft_strlen(str);
+	//	return (NULL);
+	}
+	keep = malloc((x + 1)* sizeof(char));
+	if (keep == NULL)
+		return NULL;
+
+	while (i <= x)
+	{	
+		keep[i] = str[i];
 		i++;
 	}
+	keep[i] = '\0';
+//	printf("HERE i= %d, should be 1 more than x\n", i);
+	return (keep);
 }
+
+char	*ft_rest(char *str)
+{
+	int	x,i,r;
+	char	*rest;
+
+	x = ft_find_newline(str);
+	if (x == -1)
+	{
+//		printf("do something here in REST...............");
+		free(str);
+		return (NULL);
+	}
+	if (x == 0)
+	{
+//		printf(" NOW X = 0\n");
+		return (NULL);
+	}
+	i = 0; 
+	r = 0;  // how many chars left
+	while (str[x] != '\0' && (x != 0))
+	{
+		x++;
+		r++;
+	}
+//	printf("HERE in Rest r= %d and x = %d\n", r, x);
+	rest = malloc((r+1)* sizeof(char));
+	if (rest == NULL)
+		return NULL;
+
+	while (i <= r)
+	{	
+		rest[i] = str[x-r+1+i];
+		i++;
+	}
+	rest[i] = '\0';
+	free(str);
+//	printf("rest = %s\n", rest);
+	return (rest);
+}
+
 
 char	*get_next_line(int fd)
 {
 	static char		*txt;
 	char	*keep;
-	int		flag;
 	
-	flag = 0;
-	printf("Buffer size = %d\n", BUFFER_SIZE); // print
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	txt = ft_read(fd, txt);
 	if (txt == NULL)
-		return (NULL);
-	printf("this is stored in txt = %s\n", txt);  //print
-	flag = 1;
-	printf("going to ft_keep with %s\n", txt); //print
-	keep = ft_keep(txt, flag);
-	printf("keep = %s and txt = %s\n", keep, txt)
-
-	return (txt);
+	{
+		keep = NULL;
+		return (keep);
+	}
+	keep = ft_keep(txt);
+//	printf("going to REST keep = %s and txt = %s\n", keep, txt); //print
+	txt = ft_rest(txt);
+	return (keep);
 }

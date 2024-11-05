@@ -37,19 +37,6 @@
 #  define BUFFER_SIZE 6
 # endif
 
-/* auxiliary functions */
-// char	*ft_strchr(char *str, int c);
-// char	*ft_strjoin(char *s1, char *s2);
-// size_t	ft_strlen(char *str);
-
-
-//mine
-size_t			ft_strlen(const char *s);
-char	*ft_append(char *s1, char *s2);
-int		ft_find_newline(const char *str);
-char	*ft_keep(char *txt, int flag);
-
-/* main function */
 char	*get_next_line(int fd);
 
 #endif
