@@ -24,53 +24,12 @@ int		ft_find_newline(const char *str)
 	{
 		if (str[i] == '\n')
 		{
-//			printf("newline found at i =%d \n", i);  //print
+			//printf("found new line\n");
 			return (i);
 		}
 		i++;
 	}
 	return (-1);
-}
-
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	i;
-
-	i = 0;
-	while (s[i] != '\0')
-		i++;
-	return (i);
-}
-
-char	*ft_append(char *s1, char *s2)
-{
-	char	*new_str;
-	size_t	i;
-	size_t	j;
-
-	if (s1 == NULL)
-	{
-		s1 = (char *)malloc(1 * sizeof(char));
-		s1[0] = '\0';
-	}
-	if (s1 == NULL || s2 == NULL)
-		return (NULL);
-	i = ft_strlen(s1);
-	j = ft_strlen(s2);
-	new_str = (char *) malloc((i + j + 1) * sizeof(char));
-	if (new_str == NULL)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (s1[i] != '\0')
-		new_str[j++] = s1[i++];
-	i = 0;
-	while (s2[i] != '\0')
-		new_str[j++] = s2[i++];
-	new_str[j] = '\0';
-	free(s1);
-	return (new_str);
 }
 
 char	*ft_read(int fd, char *txt)
@@ -84,7 +43,6 @@ char	*ft_read(int fd, char *txt)
 	num_chars = 1;
 	while ((num_chars = read(fd, buff, BUFFER_SIZE)) >0)
 	{
-//		printf("In while loop\n");  // print
 		if (num_chars == -1)
 		{
 			free(buff);
@@ -93,26 +51,31 @@ char	*ft_read(int fd, char *txt)
 		}
 		buff[num_chars] = '\0';
 		txt = ft_append(txt, buff);
+	//	printf("txt = %s, buff = %s, num_chars = %d\n", txt, buff, num_chars);
 		if (txt == NULL || ft_find_newline(txt) >= 0)
 			break;
 	}
+	free(buff);
 	return (txt);
 }
 
 char	*ft_keep(char *str)
 {
-	int	x,i;
+	int	x;
+	int	i;
 	char	*keep;
 
 	i = 0;
 	x = ft_find_newline(str);
-//	printf("HERE x= %d\n", x);
-	if (x == -1)
+	//printf("HERE x= %d and strlen = %ld\n", x, ft_strlen(str));
+	if (x == -1 && (ft_strlen(str) == 0))
 	{
-		x = ft_strlen(str);
-	//	return (NULL);
+		//x = ft_strlen(str);
+		return (NULL);
 	}
-	keep = malloc((x + 1)* sizeof(char));
+	if (x == -1)
+		x = ft_strlen(str);
+	keep = malloc((x + 2)* sizeof(char));
 	if (keep == NULL)
 		return NULL;
 
@@ -134,15 +97,15 @@ char	*ft_rest(char *str)
 	x = ft_find_newline(str);
 	if (x == -1)
 	{
-//		printf("do something here in REST...............");
+	//	printf("do something here in REST...............");
 		free(str);
 		return (NULL);
 	}
-	if (x == 0)
-	{
-//		printf(" NOW X = 0\n");
-		return (NULL);
-	}
+	//if (x == 0)
+	//{
+	//	printf(" NOW X = 0\n");
+	//	return (NULL);
+	//}
 	i = 0; 
 	r = 0;  // how many chars left
 	while (str[x] != '\0' && (x != 0))
@@ -155,14 +118,14 @@ char	*ft_rest(char *str)
 	if (rest == NULL)
 		return NULL;
 
-	while (i <= r)
+	while (i < r)
 	{	
 		rest[i] = str[x-r+1+i];
 		i++;
 	}
 	rest[i] = '\0';
 	free(str);
-//	printf("rest = %s\n", rest);
+	printf("rest = %s\n", rest);
 	return (rest);
 }
 
@@ -183,5 +146,7 @@ char	*get_next_line(int fd)
 	keep = ft_keep(txt);
 //	printf("going to REST keep = %s and txt = %s\n", keep, txt); //print
 	txt = ft_rest(txt);
+//	printf("after REST keep = %s and txt = %s\n", keep, txt); //print
 	return (keep);
 }
+// should i make the condition if txt or buff is /n and strlen is 1 then print /n and move on

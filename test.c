@@ -30,20 +30,25 @@
 
 int main(void)
 {
+    char *line;
+   // int i = 0;
+    //int fd = open("alternate_line_nl_with_nl", O_RDONLY);
     int fd = open("testfile.txt", O_RDONLY);
+
     if (fd == -1)
     {
         perror("Error opening file"); /// return null
         return (1);
     }
 
-    char *line;
+
 	printf("fd is : %d\n", fd);
     while ((line = get_next_line(fd)) != NULL)
     {
-        printf("Line: %s", line);
+        printf("**************Line: %s", line);
         free(line); // Free the line after each read
-    }
+
+    }       
 
     close(fd);
     return (0);
